@@ -1,8 +1,8 @@
-package es.cnieto.servlet;
+package es.cnieto.servlet.html;
 
 import org.junit.jupiter.api.Test;
 
-import static es.cnieto.servlet.StubHttpServletRequest.createHttpServletRequestWithParameter;
+import static es.cnieto.servlet.html.StubHttpServletRequest.createHttpServletRequestWithParameter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 

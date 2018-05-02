@@ -1,4 +1,4 @@
-package es.cnieto.servlet;
+package es.cnieto.servlet.html;
 
 import es.cnieto.domain.CourseLevel;
 import es.cnieto.domain.CourseLevelsReadService;
