@@ -4,3 +4,4 @@
 - Using derby database database for persistence, on disk for production environment and on memory for testing.
 # Improvements
 - Use a pool for database connection instead of open/close on each operation.
+- Add validations on creation.

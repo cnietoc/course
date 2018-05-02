@@ -4,19 +4,31 @@ import java.util.Objects;
 
 public class Course {
     private final int id;
-    private final String name;
+    private final String title;
+    private final boolean active;
+    private final int hours;
 
-    public Course(int id, String name) {
+    public Course(int id, String title, boolean active, int hours) {
         this.id = id;
-        this.name = name;
+        this.title = title;
+        this.active = active;
+        this.hours = hours;
     }
 
     public int getId() {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public int getHours() {
+        return hours;
     }
 
     @Override
@@ -25,19 +37,24 @@ public class Course {
         if (o == null || getClass() != o.getClass()) return false;
         Course course = (Course) o;
         return id == course.id &&
-                Objects.equals(name, course.name);
+                active == course.active &&
+                hours == course.hours &&
+                Objects.equals(title, course.title);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name);
+
+        return Objects.hash(id, title, active, hours);
     }
 
     @Override
     public String toString() {
         return "Course{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", title='" + title + '\'' +
+                ", active=" + active +
+                ", hours=" + hours +
                 '}';
     }
 }

@@ -18,9 +18,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public List<Course> findByActivesOrderedByName() {
+    public List<Course> findByActivesOrderedByTitle() {
         try {
-            return coursesDAO.findByActivesOrderedByName();
+            return coursesDAO.findByActivesOrderedByTitle();
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error reading Courses", e);
             return Collections.emptyList();
@@ -28,9 +28,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public void create(String name) {
+    public void create(String title, boolean active, int hours) {
         try {
-             coursesDAO.create(name);
+             coursesDAO.create(title, active, hours);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error creating Courses", e);
         }

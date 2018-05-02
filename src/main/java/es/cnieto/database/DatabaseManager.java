@@ -41,7 +41,9 @@ public class DatabaseManager {
         PreparedStatement preparedStatement = connection.prepareStatement(
                 "CREATE TABLE COURSE ( " +
                         "ID INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
-                        "NAME VARCHAR(255)" +
+                        "TITLE VARCHAR(255) NOT NULL, " +
+                        "ACTIVE BOOLEAN NOT NULL, " +
+                        "HOURS INTEGER NOT NULL " +
                         ")");
         preparedStatement.executeUpdate();
         LOG.info("COURSE Table Created");

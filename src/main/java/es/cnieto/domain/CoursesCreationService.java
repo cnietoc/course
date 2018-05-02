@@ -7,7 +7,7 @@ public class CoursesCreationService {
         this.coursesRepository = coursesRepository;
     }
 
-    public void create(String name) {
-        coursesRepository.create(name);
+    public void create(String title, Boolean active, Integer hours) {
+        coursesRepository.create(title, active, hours);
     }
 }

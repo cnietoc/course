@@ -38,37 +38,66 @@ public class CoursesServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(CONTENT_TYPE);
+        printHtmlPage(response);
+    }
 
-        PrintWriter out = response.getWriter();
-        out.println("<div>");
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        coursesCreationService.create(getTitleFrom(request), getActiveFrom(request), getHoursFrom(request));
+        printHtmlPage(response);
+    }
 
-        out.println("<h1>Cursos</h1>");
+    // TODO move to a collaborator and test it
+    private String getTitleFrom(HttpServletRequest request) {
+        return request.getParameter("title");
+    }
 
-        List<Course> courses = coursesReadService.readActivesOrderedByName();
-        for (Course course : courses) {
-            out.println("<div>");
-            out.println("<div>" + course.getName() + "</div>");
-            out.println("</div>");
+    // TODO move to a collaborator and test it
+    private Boolean getActiveFrom(HttpServletRequest request) {
+        return "yes".equals(request.getParameter("active"));
+    }
+
+    // TODO move to a collaborator and test it
+    private Integer getHoursFrom(HttpServletRequest request) {
+        try {
+            return Integer.parseInt(request.getParameter("hours"));
+        } catch (NumberFormatException e) {
+            return null;
         }
-        out.println("</div>");
+    }
 
+    private void printHtmlPage(HttpServletResponse response) throws IOException {
+        response.setContentType(CONTENT_TYPE);
+        PrintWriter out = response.getWriter();
+        appendCoursesList(out);
+
+        appendNewCourseBox(out);
+    }
+
+    private void appendNewCourseBox(PrintWriter out) {
         out.println("<div>");
         out.println("<h1>A&ntilde;adir nuevo curso</h1>");
         out.println("<form method=\"post\">");
-        out.println("<label>Nombre: <input type=\"text\" name=\"name\" /></label>");
+        out.println("<label>Nombre: <input type=\"text\" name=\"title\" /></label>");
+        out.println("<label>Horas: <input type=\"text\" name=\"hours\" /></label>");
+        out.println("<label>Activo: <input type=\"checkbox\" name=\"active\" value=\"yes\"/></label>");
         out.println("<input type=\"submit\" value=\"Enviar\" />");
         out.println("</form>");
         out.println("</div>");
     }
 
-    @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        coursesCreationService.create(request.getParameter("name"));
-        doGet(request, response);
-    }
+    private void appendCoursesList(PrintWriter out) {
+        out.println("<div>");
 
-    public void destroy() {
-        // do nothing.
+        out.println("<h1>Cursos</h1>");
+
+        List<Course> courses = coursesReadService.readActivesOrderedByTitle();
+        for (Course course : courses) {
+            out.println("<div>");
+            out.println("<div>" + course.getTitle() + "</div>");
+            out.println("<div>" + course.getHours() + "</div>");
+            out.println("</div>");
+        }
+        out.println("</div>");
     }
 }
