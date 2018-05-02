@@ -1,6 +1,7 @@
 package es.cnieto.database;
 
 import es.cnieto.domain.Course;
+import es.cnieto.domain.CourseLevel;
 import es.cnieto.domain.CoursesRepository;
 
 import java.sql.SQLException;
@@ -28,9 +29,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public void create(String title, boolean active, int hours) {
+    public void create(String title, boolean active, int hours, CourseLevel courseLevel) {
         try {
-             coursesDAO.create(title, active, hours);
+            coursesDAO.create(title, active, hours, courseLevel);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error creating Courses", e);
         }
