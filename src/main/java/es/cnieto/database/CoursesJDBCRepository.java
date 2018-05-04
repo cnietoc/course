@@ -19,9 +19,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public List<Course> findByActivesOrderedByTitle() {
+    public List<Course> findByActivesOrderByTitle() {
         try {
-            return coursesDAO.findByActivesOrderedByTitle();
+            return coursesDAO.findByActivesOrderByTitle();
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error reading Courses", e);
             return Collections.emptyList();

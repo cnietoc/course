@@ -37,7 +37,7 @@ public class CreateCourseBox {
                 hoursInput.getHtml() +
                 activeInput.getHtml() +
                 levelInput.getHtml() +
-                "<input type=\"submit\" value=\"Enviar\" />" +
+                "<input type=\"submit\" value=\"Crear\" />" +
                 "</form>" +
                 "</div>";
     }

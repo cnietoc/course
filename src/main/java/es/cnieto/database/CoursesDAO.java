@@ -21,7 +21,7 @@ public class CoursesDAO {
         this.courseLevelsDAO = courseLevelsDAO;
     }
 
-    List<Course> findByActivesOrderedByTitle() throws SQLException {
+    List<Course> findByActivesOrderByTitle() throws SQLException {
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE);
              ResultSet resultSet = preparedStatement.executeQuery()) {

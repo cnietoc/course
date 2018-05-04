@@ -51,7 +51,7 @@ class CoursesJDBCRepositoryTest {
     void findByActivesOrderedByName() throws SQLException {
         fillCourseTable();
 
-        List<Course> courses = coursesJDBCRepository.findByActivesOrderedByTitle();
+        List<Course> courses = coursesJDBCRepository.findByActivesOrderByTitle();
 
         assertIterableEquals(expectedCourses(), courses);
     }
@@ -61,7 +61,7 @@ class CoursesJDBCRepositoryTest {
         coursesJDBCRepository.create(COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel());
 
         assertIterableEquals(singletonList(new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel())),
-                coursesJDBCRepository.findByActivesOrderedByTitle());
+                coursesJDBCRepository.findByActivesOrderByTitle());
     }
 
     private void fillCourseTable() throws SQLException {

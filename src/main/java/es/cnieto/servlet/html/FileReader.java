@@ -1,4 +1,4 @@
-package es.cnieto.servlet;
+package es.cnieto.servlet.html;
 
 import java.io.InputStream;
 import java.util.Scanner;

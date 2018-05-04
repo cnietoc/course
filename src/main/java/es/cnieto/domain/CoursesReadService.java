@@ -9,7 +9,7 @@ public class CoursesReadService {
         this.coursesRepository = coursesRepository;
     }
 
-    public List<Course> readActivesOrderedByTitle() {
-        return coursesRepository.findByActivesOrderedByTitle();
+    public List<Course> readActivesOrderByTitle() {
+        return coursesRepository.findByActivesOrderByTitle();
     }
 }

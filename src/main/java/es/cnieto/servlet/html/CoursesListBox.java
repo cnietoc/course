@@ -24,7 +24,7 @@ public class CoursesListBox implements Serializable {
         html.append("<div class=\"courseTableCell\">Nivel</div>");
         html.append("</div>");
 
-        List<Course> courses = coursesReadService.readActivesOrderedByTitle();
+        List<Course> courses = coursesReadService.readActivesOrderByTitle();
         for (Course course : courses) {
             html.append("<div class=\"courseTableRow\">");
             html.append("<div class=\"courseTableCell\">");
