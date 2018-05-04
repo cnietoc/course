@@ -2,8 +2,9 @@ package es.cnieto.servlet.rest;
 
 import es.cnieto.domain.Course;
 import es.cnieto.domain.CourseLevel;
+import es.cnieto.domain.Teacher;
 
-class CourseRestConverter {
+public class CourseRestConverter {
     CourseRest from(Course course) {
         CourseRest courseRest = new CourseRest();
         courseRest.setId(course.getId());
@@ -11,6 +12,7 @@ class CourseRestConverter {
         courseRest.setActive(course.isActive());
         courseRest.setHours(course.getHours());
         courseRest.setLevel(from(course.getCourseLevel()));
+        courseRest.setTeacher(course.getTeacher().map(this::from).orElse(null));
 
         return courseRest;
     }
@@ -21,5 +23,14 @@ class CourseRestConverter {
         courseLevelRest.setLevel(courseLevel.getLevel());
 
         return courseLevelRest;
+    }
+
+    private TeacherRest from(Teacher teacher) {
+        TeacherRest teacherRest = new TeacherRest();
+        teacherRest.setId(teacher.getId());
+        teacherRest.setName(teacher.getName());
+        teacherRest.setMail(teacher.getMail());
+
+        return teacherRest;
     }
 }

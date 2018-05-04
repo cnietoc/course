@@ -2,7 +2,7 @@ package es.cnieto.servlet.html;
 
 import javax.servlet.http.HttpServletRequest;
 
-class TitleInput {
+public class TitleInput {
     private static final String PARAMETER_NAME = "title";
 
     String getHtml() {

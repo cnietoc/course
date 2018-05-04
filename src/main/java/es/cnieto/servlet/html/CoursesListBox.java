@@ -2,6 +2,7 @@ package es.cnieto.servlet.html;
 
 import es.cnieto.domain.Course;
 import es.cnieto.domain.CoursesReadService;
+import es.cnieto.domain.Teacher;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,6 +23,7 @@ public class CoursesListBox implements Serializable {
         html.append("<div class=\"courseTableCell\">Título</div>");
         html.append("<div class=\"courseTableCell\">Horas</div>");
         html.append("<div class=\"courseTableCell\">Nivel</div>");
+        html.append("<div class=\"courseTableCell\">Profesor</div>");
         html.append("</div>");
 
         List<Course> courses = coursesReadService.readActivesOrderByTitle();
@@ -36,10 +38,17 @@ public class CoursesListBox implements Serializable {
             html.append("<div class=\"courseTableCell\">");
             html.append(course.getLevel());
             html.append("</div>");
+            html.append("<div class=\"courseTableCell\">");
+            html.append(course.getTeacher().map(this::getTeacherCell).orElse("-"));
+            html.append("</div>");
             html.append("</div>");
         }
         html.append("</div>");
 
         return html.toString();
+    }
+
+    private String getTeacherCell(Teacher teacher) {
+        return teacher.getName() + " (" + teacher.getMail() + ")";
     }
 }

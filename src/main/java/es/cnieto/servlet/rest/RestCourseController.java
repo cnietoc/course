@@ -21,10 +21,10 @@ public class RestCourseController {
     private final CoursesCreationService coursesCreationService;
     private final Gson gson;
 
-    public RestCourseController(CoursesReadService coursesReadService, CoursesCreationService coursesCreationService) {
+    public RestCourseController(CoursesReadService coursesReadService, CoursesCreationService coursesCreationService, CourseRestConverter courseRestConverter) {
         this.coursesReadService = coursesReadService;
         this.coursesCreationService = coursesCreationService;
-        this.courseRestConverter = new CourseRestConverter();
+        this.courseRestConverter = courseRestConverter;
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         this.gson = gsonBuilder.create();
@@ -47,7 +47,8 @@ public class RestCourseController {
                     courseRest.getTitle(),
                     courseRest.getActive(),
                     courseRest.getHours(),
-                    courseRest.getLevelId());
+                    courseRest.getLevelId().orElse(null),
+                    courseRest.getTeacherId().orElse(null));
             response.setStatus(201);
         } catch (CourseValidationException e) {
             PrintWriter out = response.getWriter();

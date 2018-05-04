@@ -15,11 +15,11 @@ public class HtmlController implements Serializable {
     private static final String CONTENT_TYPE = "text/html";
     private final CoursesListBox coursesListBox;
     private final CreateCourseBox createCourseBox;
-    private CoursesCreationService coursesCreationService;
+    private final CoursesCreationService coursesCreationService;
 
-    public HtmlController(CoursesReadService coursesReadService, CourseLevelsReadService courseLevelsReadService, CoursesCreationService coursesCreationService) {
-        this.coursesListBox = new CoursesListBox(coursesReadService);
-        this.createCourseBox = new CreateCourseBox(courseLevelsReadService);
+    public HtmlController(CoursesListBox coursesListBox, CreateCourseBox createCourseBox, CoursesCreationService coursesCreationService) {
+        this.coursesListBox = coursesListBox;
+        this.createCourseBox = createCourseBox;
         this.coursesCreationService = coursesCreationService;
     }
 
@@ -34,7 +34,8 @@ public class HtmlController implements Serializable {
                     createCourseBox.getCourseTitleFrom(request),
                     createCourseBox.getCourseActiveFrom(request),
                     createCourseBox.getCourseHoursFrom(request),
-                    createCourseBox.getCourseLevelFrom(request));
+                    createCourseBox.getCourseLevelFrom(request),
+                    createCourseBox.getCourseTeacherFrom(request).orElse(null));
             response.setStatus(201);
         } catch (CourseValidationException e) {
             errorMessage = e.getMessage();

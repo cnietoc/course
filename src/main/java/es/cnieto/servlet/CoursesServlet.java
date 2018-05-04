@@ -15,8 +15,8 @@ public class CoursesServlet extends HttpServlet {
 
     @Override
     public void init() {
-        this.htmlController = new HtmlController(AppContext.getCoursesReadService(), AppContext.getCourseLevelsReadService(), AppContext.getCoursesCreationService());
-        this.restCourseController = new RestCourseController(AppContext.getCoursesReadService(), AppContext.getCoursesCreationService());
+        this.htmlController = AppContext.getHtmlController();
+        this.restCourseController = AppContext.getRestCourseController();
     }
 
     @Override

@@ -1,20 +1,24 @@
 package es.cnieto.servlet.html;
 
 import es.cnieto.domain.CourseLevelsReadService;
+import es.cnieto.domain.TeachersReadService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 public class CreateCourseBox {
     private final TitleInput titleInput;
     private final HoursInput hoursInput;
     private final LevelInput levelInput;
     private final ActiveInput activeInput;
+    private final TeacherInput teacherInput;
 
-    public CreateCourseBox(CourseLevelsReadService courseLevelsReadService) {
-        this.titleInput = new TitleInput();
-        this.hoursInput = new HoursInput();
-        this.activeInput = new ActiveInput();
-        this.levelInput = new LevelInput(courseLevelsReadService);
+    public CreateCourseBox(TitleInput titleInput, HoursInput hoursInput, LevelInput levelInput, ActiveInput activeInput, TeacherInput teacherInput) {
+        this.titleInput = titleInput;
+        this.hoursInput = hoursInput;
+        this.levelInput = levelInput;
+        this.activeInput = activeInput;
+        this.teacherInput = teacherInput;
     }
 
     public String getHtml(String errorMessage) {
@@ -37,6 +41,7 @@ public class CreateCourseBox {
                 hoursInput.getHtml() +
                 activeInput.getHtml() +
                 levelInput.getHtml() +
+                teacherInput.getHtml() +
                 "<input type=\"submit\" value=\"Crear\" />" +
                 "</form>" +
                 "</div>";
@@ -56,5 +61,9 @@ public class CreateCourseBox {
 
     public Integer getCourseLevelFrom(HttpServletRequest request) {
         return levelInput.getValueFrom(request);
+    }
+
+    public Optional<Integer> getCourseTeacherFrom(HttpServletRequest request) {
+        return teacherInput.getValueFrom(request);
     }
 }

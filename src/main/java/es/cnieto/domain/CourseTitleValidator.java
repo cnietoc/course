@@ -1,6 +1,6 @@
 package es.cnieto.domain;
 
-class CourseTitleValidator {
+public class CourseTitleValidator {
     void validate(String title) throws CourseValidationException {
         if (title == null || title.isEmpty()) {
             throw new CourseValidationException("Title should not be empty");

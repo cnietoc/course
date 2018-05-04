@@ -3,6 +3,7 @@ package es.cnieto.database;
 import es.cnieto.domain.Course;
 import es.cnieto.domain.CourseLevel;
 import es.cnieto.domain.CoursesRepository;
+import es.cnieto.domain.Teacher;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -29,9 +30,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public void create(String title, boolean active, int hours, CourseLevel courseLevel) {
+    public void create(String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher) {
         try {
-            coursesDAO.create(title, active, hours, courseLevel);
+            coursesDAO.create(title, active, hours, courseLevel, teacher);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error creating Courses", e);
         }

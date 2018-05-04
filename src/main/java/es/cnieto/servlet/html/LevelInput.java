@@ -5,11 +5,11 @@ import es.cnieto.domain.CourseLevelsReadService;
 
 import javax.servlet.http.HttpServletRequest;
 
-class LevelInput {
+public class LevelInput {
     private static final String PARAMETER_NAME = "level";
     private final CourseLevelsReadService courseLevelsReadService;
 
-    LevelInput(CourseLevelsReadService courseLevelsReadService) {
+    public LevelInput(CourseLevelsReadService courseLevelsReadService) {
         this.courseLevelsReadService = courseLevelsReadService;
     }
 

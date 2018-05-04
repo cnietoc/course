@@ -2,7 +2,7 @@ package es.cnieto.servlet.html;
 
 import javax.servlet.http.HttpServletRequest;
 
-class ActiveInput {
+public class ActiveInput {
     private static final String PARAMETER_NAME = "active";
     private static final String PARAMETER_TRUE_VALUE = "yes";
 

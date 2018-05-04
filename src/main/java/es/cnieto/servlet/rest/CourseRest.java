@@ -1,6 +1,7 @@
 package es.cnieto.servlet.rest;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class CourseRest {
     private Integer id;
@@ -8,6 +9,7 @@ public class CourseRest {
     private Boolean active;
     private Integer hours;
     private CourseLevelRest level;
+    private TeacherRest teacher;
 
     public Integer getId() {
         return id;
@@ -49,8 +51,20 @@ public class CourseRest {
         this.level = level;
     }
 
-    public Integer getLevelId() {
-        return level != null ? level.getId() : null;
+    public TeacherRest getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(TeacherRest teacher) {
+        this.teacher = teacher;
+    }
+
+    public Optional<Integer> getLevelId() {
+        return Optional.ofNullable(level).map(CourseLevelRest::getId);
+    }
+
+    public Optional<Integer> getTeacherId() {
+        return Optional.ofNullable(teacher).map(TeacherRest::getId);
     }
 
     @Override
@@ -62,12 +76,13 @@ public class CourseRest {
                 Objects.equals(title, that.title) &&
                 Objects.equals(active, that.active) &&
                 Objects.equals(hours, that.hours) &&
-                Objects.equals(level, that.level);
+                Objects.equals(level, that.level) &&
+                Objects.equals(teacher, that.teacher);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, active, hours, level);
+        return Objects.hash(id, title, active, hours, level, teacher);
     }
 
     @Override
@@ -78,8 +93,8 @@ public class CourseRest {
                 ", active=" + active +
                 ", hours=" + hours +
                 ", level=" + level +
+                ", teacher=" + teacher +
                 '}';
     }
-
 
 }

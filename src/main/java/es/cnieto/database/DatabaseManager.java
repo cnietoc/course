@@ -17,13 +17,22 @@ public class DatabaseManager {
             ")";
     private static final List<String> COURSE_LEVELS = asList("Básico", "Intermedio", "Avanzado");
 
+    private static final String TEACHER_TABLE_NAME = "TEACHER";
+    private static final String CREATE_TABLE_TEACHER_SQL = "CREATE TABLE TEACHER ( " +
+            "ID INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
+            "NAME VARCHAR(255) NOT NULL, " +
+            "MAIL VARCHAR(255) NOT NULL " +
+            ")";
+    private static final List<String[]> TEACHERS = asList(new String[]{"Profesor Bacterio", "bacterio@superprofe.com"}, new String[]{"Profesor Xavier", "xmen@superprofe.com"});
+
     private static final String COURSE_TABLE_NAME = "COURSE";
     private static final String CREATE_TABLE_COURSE_SQL = "CREATE TABLE COURSE ( " +
             "ID INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
             "TITLE VARCHAR(255) NOT NULL, " +
             "ACTIVE BOOLEAN NOT NULL, " +
-            "HOURS INTEGER NOT NULL," +
-            "LEVEL_ID INTEGER NOT NULL REFERENCES COURSE_LEVEL(ID)" +
+            "HOURS INTEGER NOT NULL, " +
+            "LEVEL_ID INTEGER NOT NULL REFERENCES COURSE_LEVEL(ID), " +
+            "TEACHER_ID INTEGER DEFAULT NULL REFERENCES TEACHER(ID) " +
             ")";
 
     private final String databasePath;
@@ -31,6 +40,10 @@ public class DatabaseManager {
     public DatabaseManager(String databasePath) throws SQLException {
         this.databasePath = databasePath;
         try (Connection connection = getConnection()) {
+            if (!isTableCreated(TEACHER_TABLE_NAME, connection)) {
+                createTeacherTable(connection);
+                fillTeacherTable(connection);
+            }
             if (!isTableCreated(COURSE_LEVEL_TABLE_NAME, connection)) {
                 createCourseLevelTable(connection);
                 fillCourseLevelTable(connection);
@@ -60,10 +73,24 @@ public class DatabaseManager {
         return courseTableCreated;
     }
 
-    private void createCourseTable(Connection connection) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE_COURSE_SQL);
+    private void createTeacherTable(Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE_TEACHER_SQL);
         preparedStatement.executeUpdate();
-        LOG.info("COURSE Table Created");
+        LOG.info("TEACHER Table Created");
+    }
+
+    private void fillTeacherTable(Connection connection) throws SQLException {
+        for (String[] teacher : TEACHERS) {
+            insertTeacher(teacher[0], teacher[1], connection);
+        }
+    }
+
+    private void insertTeacher(String name, String mail, Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO TEACHER(NAME, MAIL) VALUES (?, ?)");
+        preparedStatement.setString(1, name);
+        preparedStatement.setString(2, mail);
+
+        preparedStatement.executeUpdate();
     }
 
     private void createCourseLevelTable(Connection connection) throws SQLException {
@@ -82,5 +109,11 @@ public class DatabaseManager {
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO COURSE_LEVEL(LEVEL) VALUES (?)");
         preparedStatement.setString(1, level);
         preparedStatement.executeUpdate();
+    }
+
+    private void createCourseTable(Connection connection) throws SQLException {
+        PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE_COURSE_SQL);
+        preparedStatement.executeUpdate();
+        LOG.info("COURSE Table Created");
     }
 }

@@ -2,7 +2,7 @@ package es.cnieto.servlet.html;
 
 import javax.servlet.http.HttpServletRequest;
 
-class HoursInput {
+public class HoursInput {
     private static final String PARAMETER_NAME = "hours";
 
     String getHtml() {

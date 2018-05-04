@@ -1,6 +1,7 @@
 package es.cnieto.domain;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Course {
     private final int id;
@@ -8,13 +9,19 @@ public class Course {
     private final boolean active;
     private final int hours;
     private final CourseLevel courseLevel;
+    private final Teacher teacher;
 
-    public Course(int id, String title, boolean active, int hours, CourseLevel courseLevel) {
+    public Course(int id, String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher) {
         this.id = id;
         this.title = title;
         this.active = active;
         this.hours = hours;
         this.courseLevel = courseLevel;
+        this.teacher = teacher;
+    }
+
+    public String getLevel() {
+        return courseLevel.getLevel();
     }
 
     public int getId() {
@@ -37,8 +44,8 @@ public class Course {
         return courseLevel;
     }
 
-    public String getLevel() {
-        return courseLevel.getLevel();
+    public Optional<Teacher> getTeacher() {
+        return Optional.ofNullable(teacher);
     }
 
     @Override
@@ -50,12 +57,13 @@ public class Course {
                 active == course.active &&
                 hours == course.hours &&
                 Objects.equals(title, course.title) &&
-                Objects.equals(courseLevel, course.courseLevel);
+                Objects.equals(courseLevel, course.courseLevel) &&
+                Objects.equals(teacher, course.teacher);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, active, hours, courseLevel);
+        return Objects.hash(id, title, active, hours, courseLevel, teacher);
     }
 
     @Override
@@ -66,7 +74,7 @@ public class Course {
                 ", active=" + active +
                 ", hours=" + hours +
                 ", courseLevel=" + courseLevel +
+                ", teacher=" + teacher +
                 '}';
     }
-
 }

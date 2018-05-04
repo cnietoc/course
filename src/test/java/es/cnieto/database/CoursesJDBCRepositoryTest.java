@@ -2,6 +2,7 @@ package es.cnieto.database;
 
 import es.cnieto.domain.Course;
 import es.cnieto.domain.CourseLevel;
+import es.cnieto.domain.Teacher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,9 @@ class CoursesJDBCRepositoryTest {
     private static final int COURSE_THREE_HOURS = 30;
     private static final String COURSE_LEVEL_ONE = "Básico";
     private static final int COURSE_LEVEL_ONE_ID = 1;
+    private static final int TEACHER_ONE_ID = 1;
+    private static final String TEACHER_ONE_NAME = "Profesor Bacterio";
+    private static final String TEACHER_ONE_MAIL = "bacterio@superprofe.com";
 
     private CoursesJDBCRepository coursesJDBCRepository;
     private DatabaseManager databaseManager;
@@ -35,7 +39,8 @@ class CoursesJDBCRepositoryTest {
     void setup() throws SQLException {
         this.databaseManager = new DatabaseManager("memory:myDB");
         CourseLevelsDAO courseLevelsDAO = new CourseLevelsDAO(databaseManager);
-        CoursesDAO coursesDAO = new CoursesDAO(databaseManager, courseLevelsDAO);
+        TeachersDAO teachersDAO = new TeachersDAO(databaseManager);
+        CoursesDAO coursesDAO = new CoursesDAO(databaseManager, courseLevelsDAO, teachersDAO);
         this.coursesJDBCRepository = new CoursesJDBCRepository(coursesDAO);
     }
 
@@ -57,18 +62,26 @@ class CoursesJDBCRepositoryTest {
     }
 
     @Test
-    void create() {
-        coursesJDBCRepository.create(COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel());
+    void createWithoutTeacher() {
+        coursesJDBCRepository.create(COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), null);
 
-        assertIterableEquals(singletonList(new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel())),
+        assertIterableEquals(singletonList(new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), null)),
+                coursesJDBCRepository.findByActivesOrderByTitle());
+    }
+
+    @Test
+    void createWithTeacher() {
+        coursesJDBCRepository.create(COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), firstTeacher());
+
+        assertIterableEquals(singletonList(new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), firstTeacher())),
                 coursesJDBCRepository.findByActivesOrderByTitle());
     }
 
     private void fillCourseTable() throws SQLException {
         try (Connection connection = databaseManager.getConnection()) {
             Statement statement = connection.createStatement();
-            statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID) " +
-                    "VALUES ('" + COURSE_ONE_TITLE + "', " + COURSE_ONE_ACTIVE + ", " + COURSE_ONE_HOURS + " , " + COURSE_LEVEL_ONE_ID + " )");
+            statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID) " +
+                    "VALUES ('" + COURSE_ONE_TITLE + "', " + COURSE_ONE_ACTIVE + ", " + COURSE_ONE_HOURS + " , " + COURSE_LEVEL_ONE_ID + ", " + TEACHER_ONE_ID + " )");
             statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID) " +
                     "VALUES ('" + COURSE_TWO_TITLE + "', " + COURSE_TWO_ACTIVE + ", " + COURSE_TWO_HOURS + " , " + COURSE_LEVEL_ONE_ID + " )");
             statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID) " +
@@ -77,12 +90,15 @@ class CoursesJDBCRepositoryTest {
     }
 
     private List<Course> expectedCourses() {
-        return asList(new Course(2, COURSE_TWO_TITLE, COURSE_TWO_ACTIVE, COURSE_TWO_HOURS, firstCourseLevel()),
-                new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel()));
+        return asList(new Course(2, COURSE_TWO_TITLE, COURSE_TWO_ACTIVE, COURSE_TWO_HOURS, firstCourseLevel(), null),
+                new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), firstTeacher()));
     }
-
 
     private CourseLevel firstCourseLevel() {
         return new CourseLevel(COURSE_LEVEL_ONE_ID, COURSE_LEVEL_ONE);
+    }
+
+    private Teacher firstTeacher() {
+        return new Teacher(TEACHER_ONE_ID, TEACHER_ONE_NAME, TEACHER_ONE_MAIL);
     }
 }
