@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class LevelInput {
     private static final String PARAMETER_NAME = "level";
+    private static final String INPUT_LABEL_TEXT = "Nivel: ";
     private final CourseLevelsReadService courseLevelsReadService;
 
     public LevelInput(CourseLevelsReadService courseLevelsReadService) {
@@ -15,7 +16,7 @@ public class LevelInput {
 
     String getHtml() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<label>Nivel: <select name=\"" + PARAMETER_NAME + "\"> ");
+        stringBuilder.append("<label>" + INPUT_LABEL_TEXT + "<select name=\"" + PARAMETER_NAME + "\"> ");
         for (CourseLevel courseLevel : courseLevelsReadService.readLevels()) {
             stringBuilder.append("<option value=\"");
             stringBuilder.append(courseLevel.getId());

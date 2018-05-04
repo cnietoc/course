@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 public class CreateCourseBox {
+    private static final String BR = "<br />";
+    private static final String TITLE_TEXT = "A&ntilde;adir nuevo curso";
+    private static final String SUBMIT_TEXT = "Crear";
     private final TitleInput titleInput;
     private final HoursInput hoursInput;
     private final LevelInput levelInput;
@@ -35,14 +38,14 @@ public class CreateCourseBox {
 
     private String getInputs() {
         return "<div>" +
-                "<h1>A&ntilde;adir nuevo curso</h1>" +
+                "<h1>" + TITLE_TEXT + "</h1>" +
                 "<form method=\"post\">" +
-                titleInput.getHtml() +
-                hoursInput.getHtml() +
-                activeInput.getHtml() +
-                levelInput.getHtml() +
-                teacherInput.getHtml() +
-                "<input type=\"submit\" value=\"Crear\" />" +
+                titleInput.getHtml() + BR +
+                hoursInput.getHtml() + BR +
+                activeInput.getHtml() + BR +
+                levelInput.getHtml() + BR +
+                teacherInput.getHtml() + BR +
+                "<input type=\"submit\" value=\"" + SUBMIT_TEXT + "\" />" +
                 "</form>" +
                 "</div>";
     }
