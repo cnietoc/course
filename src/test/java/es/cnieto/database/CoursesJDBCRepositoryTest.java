@@ -14,6 +14,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 
 class CoursesJDBCRepositoryTest {
@@ -26,11 +27,16 @@ class CoursesJDBCRepositoryTest {
     private static final String COURSE_THREE_TITLE = "CC Course three";
     private static final boolean COURSE_THREE_ACTIVE = false;
     private static final int COURSE_THREE_HOURS = 30;
+    private static final String COURSE_FOURTH_TITLE = "AB Course four";
+    private static final boolean COURSE_FOURTH_ACTIVE = true;
+    private static final int COURSE_FOURTH_HOURS = 50;
     private static final String COURSE_LEVEL_ONE = "Básico";
     private static final int COURSE_LEVEL_ONE_ID = 1;
     private static final int TEACHER_ONE_ID = 1;
     private static final String TEACHER_ONE_NAME = "Profesor Bacterio";
     private static final String TEACHER_ONE_MAIL = "bacterio@superprofe.com";
+    private static final int ITEMS_PER_PAGE = 2;
+    private static final short TOTAL_ACTIVES_COURSES = 3;
 
     private CoursesJDBCRepository coursesJDBCRepository;
     private DatabaseManager databaseManager;
@@ -53,12 +59,30 @@ class CoursesJDBCRepositoryTest {
     }
 
     @Test
-    void findByActivesOrderedByName() throws SQLException {
+    void findByActivesOrderedByTitle() throws SQLException {
         fillCourseTable();
 
         List<Course> courses = coursesJDBCRepository.findByActivesOrderByTitle();
 
         assertIterableEquals(expectedCourses(), courses);
+    }
+
+    @Test
+    void findByActivesPaginatedOrderByTitleWhenIsFirstPage() throws SQLException {
+        fillCourseTable();
+
+        List<Course> courses = coursesJDBCRepository.findByActivesPaginatedOrderByTitle(1, ITEMS_PER_PAGE);
+
+        assertIterableEquals(expectedCourses().subList(0, 2), courses);
+    }
+
+    @Test
+    void findByActivesPaginatedOrderByTitleWhenIsSecondPage() throws SQLException {
+        fillCourseTable();
+
+        List<Course> courses = coursesJDBCRepository.findByActivesPaginatedOrderByTitle(2, ITEMS_PER_PAGE);
+
+        assertIterableEquals(expectedCourses().subList(2, 3), courses);
     }
 
     @Test
@@ -77,6 +101,15 @@ class CoursesJDBCRepositoryTest {
                 coursesJDBCRepository.findByActivesOrderByTitle());
     }
 
+    @Test
+    void countActives() throws SQLException {
+        fillCourseTable();
+
+        int count = coursesJDBCRepository.countActives();
+
+        assertEquals(TOTAL_ACTIVES_COURSES, count);
+    }
+
     private void fillCourseTable() throws SQLException {
         try (Connection connection = databaseManager.getConnection()) {
             Statement statement = connection.createStatement();
@@ -86,11 +119,14 @@ class CoursesJDBCRepositoryTest {
                     "VALUES ('" + COURSE_TWO_TITLE + "', " + COURSE_TWO_ACTIVE + ", " + COURSE_TWO_HOURS + " , " + COURSE_LEVEL_ONE_ID + " )");
             statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID) " +
                     "VALUES ('" + COURSE_THREE_TITLE + "', " + COURSE_THREE_ACTIVE + ", " + COURSE_THREE_HOURS + " , " + COURSE_LEVEL_ONE_ID + " )");
+            statement.executeUpdate("INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID) " +
+                    "VALUES ('" + COURSE_FOURTH_TITLE + "', " + COURSE_FOURTH_ACTIVE + ", " + COURSE_FOURTH_HOURS + " , " + COURSE_LEVEL_ONE_ID + " )");
         }
     }
 
     private List<Course> expectedCourses() {
         return asList(new Course(2, COURSE_TWO_TITLE, COURSE_TWO_ACTIVE, COURSE_TWO_HOURS, firstCourseLevel(), null),
+                new Course(4, COURSE_FOURTH_TITLE, COURSE_FOURTH_ACTIVE, COURSE_FOURTH_HOURS, firstCourseLevel(), null),
                 new Course(1, COURSE_ONE_TITLE, COURSE_ONE_ACTIVE, COURSE_ONE_HOURS, firstCourseLevel(), firstTeacher()));
     }
 

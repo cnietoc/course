@@ -30,11 +30,31 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
+    public List<Course> findByActivesPaginatedOrderByTitle(int page, int itemsPerPage) {
+        try {
+            return coursesDAO.findByActivesPaginatedOrderByTitle(page, itemsPerPage);
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "Error reading Courses", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
     public void create(String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher) {
         try {
             coursesDAO.create(title, active, hours, courseLevel, teacher);
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error creating Courses", e);
+        }
+    }
+
+    @Override
+    public int countActives() {
+        try {
+            return coursesDAO.countActives();
+        } catch (SQLException e) {
+            LOG.log(Level.SEVERE, "Error counting Courses", e);
+            return 0;
         }
     }
 }

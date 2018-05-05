@@ -12,6 +12,8 @@ import java.util.Optional;
 public class CoursesDAO {
     private static final String SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE = "SELECT ID, TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID FROM COURSE WHERE ACTIVE = TRUE ORDER BY TITLE ASC";
     private static final String SQL_CREATE_COURSE = "INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID) VALUES (?, ?, ?, ?, ?)";
+    private static final String PAGINATED_SQL_FRAGMENT = " OFFSET ? ROWS FETCH FIRST ? ROWS ONLY";
+    private static final String SQL_COUNT = "SELECT COUNT(*) FROM COURSE WHERE ACTIVE = TRUE ";
     private final DatabaseManager databaseManager;
     private final CourseLevelsDAO courseLevelsDAO;
     private final TeachersDAO teachersDAO;
@@ -26,36 +28,26 @@ public class CoursesDAO {
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE);
              ResultSet resultSet = preparedStatement.executeQuery()) {
-            List<Course> courses = new ArrayList<>();
-
-            while (resultSet.next()) {
-                courses.add(
-                        new Course(
-                                resultSet.getInt("ID"),
-                                resultSet.getString("TITLE"),
-                                resultSet.getBoolean("ACTIVE"),
-                                resultSet.getInt("HOURS"),
-                                courseLevelsDAO.findById(resultSet.getInt("LEVEL_ID")).orElse(null),
-                                getTeacherFrom(resultSet)
-                        ));
-            }
-            return courses;
+            return getCoursesFrom(resultSet);
         }
     }
 
-    private Teacher getTeacherFrom(ResultSet resultSet) throws SQLException {
-        return Optional.ofNullable(resultSet.getObject("TEACHER_ID", Integer.class))
-                .flatMap(teacherId -> {
-                    try {
-                        return teachersDAO.findById(teacherId);
-                    } catch (SQLException e) {
-                        return Optional.empty();
-                    }
-                })
-                .orElse(null);
+    List<Course> findByActivesPaginatedOrderByTitle(int page, int itemsPerPage) throws SQLException {
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE + PAGINATED_SQL_FRAGMENT)) {
+            {
+                preparedStatement.setInt(1, calculateOffsetFrom(page, itemsPerPage));
+                preparedStatement.setInt(2, itemsPerPage);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    return getCoursesFrom(resultSet);
+                }
+
+            }
+        }
     }
 
-    void create(String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher) throws SQLException {
+    void create(String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher) throws
+            SQLException {
         try (
                 Connection connection = databaseManager.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(SQL_CREATE_COURSE)
@@ -71,5 +63,47 @@ public class CoursesDAO {
             }
             preparedStatement.executeUpdate();
         }
+    }
+
+    int countActives() throws SQLException {
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_COUNT);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+
+            return resultSet.next() ? resultSet.getInt(1) : 0;
+        }
+    }
+
+    private int calculateOffsetFrom(int page, int itemsPerPage) {
+        return (page - 1) * itemsPerPage;
+    }
+
+    private List<Course> getCoursesFrom(ResultSet resultSet) throws SQLException {
+        List<Course> courses = new ArrayList<>();
+
+        while (resultSet.next()) {
+            courses.add(
+                    new Course(
+                            resultSet.getInt("ID"),
+                            resultSet.getString("TITLE"),
+                            resultSet.getBoolean("ACTIVE"),
+                            resultSet.getInt("HOURS"),
+                            courseLevelsDAO.findById(resultSet.getInt("LEVEL_ID")).orElse(null),
+                            getTeacherFrom(resultSet)
+                    ));
+        }
+        return courses;
+    }
+
+    private Teacher getTeacherFrom(ResultSet resultSet) throws SQLException {
+        return Optional.ofNullable(resultSet.getObject("TEACHER_ID", Integer.class))
+                .flatMap(teacherId -> {
+                    try {
+                        return teachersDAO.findById(teacherId);
+                    } catch (SQLException e) {
+                        return Optional.empty();
+                    }
+                })
+                .orElse(null);
     }
 }

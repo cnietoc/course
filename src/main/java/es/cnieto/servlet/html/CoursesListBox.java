@@ -4,6 +4,7 @@ import es.cnieto.domain.Course;
 import es.cnieto.domain.CoursesReadService;
 import es.cnieto.domain.Teacher;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,7 +20,8 @@ public class CoursesListBox implements Serializable {
         this.coursesReadService = coursesReadService;
     }
 
-    public String getHtml() {
+    public String getHtml(HttpServletRequest request) {
+
         StringBuilder html = new StringBuilder();
         html.append("<div>");
         html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
@@ -31,7 +33,9 @@ public class CoursesListBox implements Serializable {
         html.append("<div class=\"courseTableCell\">" + TABLE_TEACHER_TEXT + "</div>");
         html.append("</div>");
 
-        List<Course> courses = coursesReadService.readActivesOrderByTitle();
+        int currentPage = getPageFrom(request);
+
+        List<Course> courses = coursesReadService.readActivesPaginatedOrderByTitle(currentPage);
         for (Course course : courses) {
             html.append("<div class=\"courseTableRow\">");
             html.append("<div class=\"courseTableCell\">");
@@ -50,7 +54,38 @@ public class CoursesListBox implements Serializable {
         }
         html.append("</div>");
 
+        printPagination(currentPage, html);
+
         return html.toString();
+    }
+
+    private void printPagination(int currentPage, StringBuilder html) {
+
+        int pages = coursesReadService.activesPages();
+        html.append("<div class=\"pagination\">");
+
+        for (int page = 1; page <= pages; page++) {
+            html.append(page == currentPage ? "<b>" : "");
+            html.append("<a href=\"");
+            html.append(linkFor(page));
+            html.append("\" >");
+            html.append(page);
+            html.append("</a>");
+            html.append(page == currentPage ? "</b>" : "");
+        }
+        html.append("</div>");
+    }
+
+    private int getPageFrom(HttpServletRequest request) {
+        try {
+            return Integer.parseInt(request.getParameter("page"));
+        } catch (NumberFormatException | NullPointerException e) {
+            return 1;
+        }
+    }
+
+    private String linkFor(int page) {
+        return "?page=" + page;
     }
 
     private String getTeacherCell(Teacher teacher) {

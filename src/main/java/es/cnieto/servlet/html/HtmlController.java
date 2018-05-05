@@ -1,9 +1,7 @@
 package es.cnieto.servlet.html;
 
-import es.cnieto.domain.CourseLevelsReadService;
 import es.cnieto.domain.CourseValidationException;
 import es.cnieto.domain.CoursesCreationService;
-import es.cnieto.domain.CoursesReadService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,7 +22,7 @@ public class HtmlController implements Serializable {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        printHtml(response, null);
+        printHtml(request, response, null);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -41,10 +39,10 @@ public class HtmlController implements Serializable {
             errorMessage = e.getMessage();
             response.setStatus(400);
         }
-        printHtml(response, errorMessage);
+        printHtml(request, response, errorMessage);
     }
 
-    private void printHtml(HttpServletResponse response, String errorMessage) throws IOException {
+    private void printHtml(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws IOException {
         response.setContentType(CONTENT_TYPE);
         PrintWriter out = response.getWriter();
         out.println("<html>");
@@ -54,7 +52,7 @@ public class HtmlController implements Serializable {
         out.println("</style>");
         out.println("</head>");
         out.println("<body>");
-        out.println(coursesListBox.getHtml());
+        out.println(coursesListBox.getHtml(request));
         out.println(createCourseBox.getHtml(errorMessage));
         out.println("</body>");
         out.println("</html>");

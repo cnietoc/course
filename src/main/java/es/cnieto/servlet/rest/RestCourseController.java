@@ -31,7 +31,7 @@ public class RestCourseController {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        List<Course> courses = coursesReadService.readActivesOrderByTitle();
+        List<Course> courses = coursesReadService.readActives();
 
         List<CourseRest> coursesRest = courses.stream().map(courseRestConverter::from).collect(toList());
 
