@@ -3,9 +3,9 @@ package es.cnieto.domain;
 import java.util.List;
 
 public interface CoursesRepository {
-    List<Course> findByActivesOrderByTitle();
+    List<Course> findByActivesOrderBy(CourseOrder courseOrder);
 
-    List<Course> findByActivesPaginatedOrderByTitle(int page, int itemsPerPage);
+    List<Course> findByActivesPaginatedOrderBy(int page, int itemsPerPage, CourseOrder courseOrder);
 
     void create(String title, boolean active, int hours, CourseLevel courseLevel, Teacher teacher);
 

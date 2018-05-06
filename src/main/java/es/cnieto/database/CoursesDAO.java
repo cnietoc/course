@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class CoursesDAO {
-    private static final String SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE = "SELECT ID, TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID FROM COURSE WHERE ACTIVE = TRUE ORDER BY TITLE ASC";
+    private static final String SQL_FIND_BY_ACTIVES_ORDER_BY = "SELECT ID, TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID FROM COURSE WHERE ACTIVE = TRUE ORDER BY ";
     private static final String SQL_CREATE_COURSE = "INSERT INTO COURSE(TITLE, ACTIVE, HOURS, LEVEL_ID, TEACHER_ID) VALUES (?, ?, ?, ?, ?)";
     private static final String PAGINATED_SQL_FRAGMENT = " OFFSET ? ROWS FETCH FIRST ? ROWS ONLY";
     private static final String SQL_COUNT = "SELECT COUNT(*) FROM COURSE WHERE ACTIVE = TRUE ";
@@ -24,17 +24,17 @@ public class CoursesDAO {
         this.teachersDAO = teachersDAO;
     }
 
-    List<Course> findByActivesOrderByTitle() throws SQLException {
+    List<Course> findByActivesOrderBy(Order order) throws SQLException {
         try (Connection connection = databaseManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE);
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY + order.columnName);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             return getCoursesFrom(resultSet);
         }
     }
 
-    List<Course> findByActivesPaginatedOrderByTitle(int page, int itemsPerPage) throws SQLException {
+    List<Course> findByActivesPaginatedOrderBy(int page, int itemsPerPage, Order order) throws SQLException {
         try (Connection connection = databaseManager.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY_TITLE + PAGINATED_SQL_FRAGMENT)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_FIND_BY_ACTIVES_ORDER_BY + order.columnName + PAGINATED_SQL_FRAGMENT)) {
             {
                 preparedStatement.setInt(1, calculateOffsetFrom(page, itemsPerPage));
                 preparedStatement.setInt(2, itemsPerPage);
@@ -105,5 +105,15 @@ public class CoursesDAO {
                     }
                 })
                 .orElse(null);
+    }
+
+    enum Order {
+        TITLE("TITLE ASC"), HOURS("HOURS ASC, TITLE ASC"), LEVEL("LEVEL_ID ASC, TITLE ASC");
+
+        private final String columnName;
+
+        Order(String columnName) {
+            this.columnName = columnName;
+        }
     }
 }

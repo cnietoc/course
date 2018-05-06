@@ -1,9 +1,6 @@
 package es.cnieto.database;
 
-import es.cnieto.domain.Course;
-import es.cnieto.domain.CourseLevel;
-import es.cnieto.domain.CoursesRepository;
-import es.cnieto.domain.Teacher;
+import es.cnieto.domain.*;
 
 import java.sql.SQLException;
 import java.util.Collections;
@@ -14,15 +11,17 @@ import java.util.logging.Logger;
 public class CoursesJDBCRepository implements CoursesRepository {
     private static final Logger LOG = Logger.getLogger("es.cnieto.database.CoursesJDBCRepository");
     private final CoursesDAO coursesDAO;
+    private final CoursesDAOOrderConverter coursesDAOOrderConverter;
 
-    public CoursesJDBCRepository(CoursesDAO coursesDAO) {
+    public CoursesJDBCRepository(CoursesDAO coursesDAO, CoursesDAOOrderConverter coursesDAOOrderConverter) {
         this.coursesDAO = coursesDAO;
+        this.coursesDAOOrderConverter = coursesDAOOrderConverter;
     }
 
     @Override
-    public List<Course> findByActivesOrderByTitle() {
+    public List<Course> findByActivesOrderBy(CourseOrder courseOrder) {
         try {
-            return coursesDAO.findByActivesOrderByTitle();
+            return coursesDAO.findByActivesOrderBy(coursesDAOOrderConverter.from(courseOrder));
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error reading Courses", e);
             return Collections.emptyList();
@@ -30,9 +29,9 @@ public class CoursesJDBCRepository implements CoursesRepository {
     }
 
     @Override
-    public List<Course> findByActivesPaginatedOrderByTitle(int page, int itemsPerPage) {
+    public List<Course> findByActivesPaginatedOrderBy(int page, int itemsPerPage, CourseOrder courseOrder) {
         try {
-            return coursesDAO.findByActivesPaginatedOrderByTitle(page, itemsPerPage);
+            return coursesDAO.findByActivesPaginatedOrderBy(page, itemsPerPage, coursesDAOOrderConverter.from(courseOrder));
         } catch (SQLException e) {
             LOG.log(Level.SEVERE, "Error reading Courses", e);
             return Collections.emptyList();

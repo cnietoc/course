@@ -14,28 +14,32 @@ public class CoursesListBox implements Serializable {
     private static final String TABLE_HOURS_TEXT = "Horas";
     private static final String TABLE_LEVEL_TEXT = "Nivel";
     private static final String TABLE_TEACHER_TEXT = "Profesor";
+    private static final String PAGE_PARAMETER = "page";
+    private static final String ORDER_PARAMETER = "order";
     private final CoursesReadService coursesReadService;
+    private final OrderConverter orderConverter;
 
-    public CoursesListBox(CoursesReadService coursesReadService) {
+    public CoursesListBox(CoursesReadService coursesReadService, OrderConverter orderConverter) {
         this.coursesReadService = coursesReadService;
+        this.orderConverter = orderConverter;
     }
 
     public String getHtml(HttpServletRequest request) {
+        int currentPage = getPageFrom(request);
+        OrderParameter orderParameter = getOrderFrom(request);
 
         StringBuilder html = new StringBuilder();
         html.append("<div>");
         html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
         html.append("<div class=\"courseTable\">");
         html.append("<div class=\"courseTableHeader\">");
-        html.append("<div class=\"courseTableCell\">" + TABLE_TITLE_TEXT + "</div>");
-        html.append("<div class=\"courseTableCell\">" + TABLE_HOURS_TEXT + "</div>");
-        html.append("<div class=\"courseTableCell\">" + TABLE_LEVEL_TEXT + "</div>");
+        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_TITLE_TEXT, 1, OrderParameter.TITLE) + "</div>");
+        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_HOURS_TEXT, 1, OrderParameter.HOURS) + "</div>");
+        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_LEVEL_TEXT, 1, OrderParameter.LEVEL) + "</div>");
         html.append("<div class=\"courseTableCell\">" + TABLE_TEACHER_TEXT + "</div>");
         html.append("</div>");
 
-        int currentPage = getPageFrom(request);
-
-        List<Course> courses = coursesReadService.readActivesPaginatedOrderByTitle(currentPage);
+        List<Course> courses = coursesReadService.readActivesPaginatedOrderBy(currentPage, orderConverter.from(orderParameter));
         for (Course course : courses) {
             html.append("<div class=\"courseTableRow\">");
             html.append("<div class=\"courseTableCell\">");
@@ -54,38 +58,42 @@ public class CoursesListBox implements Serializable {
         }
         html.append("</div>");
 
-        printPagination(currentPage, html);
+        printPagination(currentPage, orderParameter, html);
 
         return html.toString();
     }
 
-    private void printPagination(int currentPage, StringBuilder html) {
+    private void printPagination(int currentPage, OrderParameter orderParameter, StringBuilder html) {
 
         int pages = coursesReadService.activesPages();
         html.append("<div class=\"pagination\">");
 
         for (int page = 1; page <= pages; page++) {
             html.append(page == currentPage ? "<b>" : "");
-            html.append("<a href=\"");
-            html.append(linkFor(page));
-            html.append("\" >");
-            html.append(page);
-            html.append("</a>");
+            html.append(createLinkFor(String.valueOf(page), page, orderParameter));
             html.append(page == currentPage ? "</b>" : "");
         }
         html.append("</div>");
     }
 
+    private String createLinkFor(String text, int page, OrderParameter orderParameter) {
+        return "<a href=\"" + hrefFor(page, orderParameter) + "\" >" + text + "</a>";
+    }
+
     private int getPageFrom(HttpServletRequest request) {
         try {
-            return Integer.parseInt(request.getParameter("page"));
+            return Integer.parseInt(request.getParameter(PAGE_PARAMETER));
         } catch (NumberFormatException | NullPointerException e) {
             return 1;
         }
     }
 
-    private String linkFor(int page) {
-        return "?page=" + page;
+    private OrderParameter getOrderFrom(HttpServletRequest request) {
+        return OrderParameter.findFrom(request.getParameter(ORDER_PARAMETER)).orElse(OrderParameter.TITLE);
+    }
+
+    private String hrefFor(int page, OrderParameter orderParameter) {
+        return "?page=" + page + "&order=" + orderParameter.getValue();
     }
 
     private String getTeacherCell(Teacher teacher) {

@@ -13,6 +13,7 @@ public abstract class AppContext {
 
     private static DatabaseManager databaseManager;
     private static CoursesDAO coursesDAO;
+    private static CoursesDAOOrderConverter coursesDAOOrderConverter;
     private static CourseLevelsDAO coursesLevelsDAO;
     private static TeachersDAO teachersDAO;
 
@@ -30,6 +31,7 @@ public abstract class AppContext {
     private static TeachersReadService teachersReadService;
 
     private static CoursesListBox coursesListBox;
+    private static OrderConverter orderConverter;
     private static TitleInput titleInput;
     private static HoursInput hoursInput;
     private static LevelInput levelInput;
@@ -88,9 +90,15 @@ public abstract class AppContext {
         return teacherInput;
     }
 
+    private static OrderConverter getOrderConverter() {
+        if (orderConverter == null)
+            orderConverter = new OrderConverter();
+        return orderConverter;
+    }
+
     private static CoursesListBox getCoursesListBox() {
         if (coursesListBox == null) {
-            coursesListBox = new CoursesListBox(getCoursesReadService());
+            coursesListBox = new CoursesListBox(getCoursesReadService(), getOrderConverter());
         }
         return coursesListBox;
     }
@@ -135,19 +143,19 @@ public abstract class AppContext {
         return teachersReadService;
     }
 
-    public static CourseTitleValidator getCourseTitleValidator() {
+    private static CourseTitleValidator getCourseTitleValidator() {
         if (courseTitleValidator == null)
             courseTitleValidator = new CourseTitleValidator();
         return courseTitleValidator;
     }
 
-    public static CourseActiveValidator getCourseActiveValidator() {
+    private static CourseActiveValidator getCourseActiveValidator() {
         if (courseActiveValidator == null)
             courseActiveValidator = new CourseActiveValidator();
         return courseActiveValidator;
     }
 
-    public static CourseHoursValidator getCourseHoursValidator() {
+    private static CourseHoursValidator getCourseHoursValidator() {
         if (courseHoursValidator == null)
             courseHoursValidator = new CourseHoursValidator();
         return courseHoursValidator;
@@ -155,7 +163,7 @@ public abstract class AppContext {
 
     private static CoursesRepository getCoursesRepository() {
         if (coursesRepository == null)
-            coursesRepository = new CoursesJDBCRepository(getCoursesDAO());
+            coursesRepository = new CoursesJDBCRepository(getCoursesDAO(), getCoursesDAOOrderConverter());
 
         return coursesRepository;
     }
@@ -178,6 +186,13 @@ public abstract class AppContext {
             coursesDAO = new CoursesDAO(getDatabaseManager(), getCoursesLevelsDAO(), getTeachersDAO());
 
         return coursesDAO;
+    }
+
+    private static CoursesDAOOrderConverter getCoursesDAOOrderConverter() {
+        if (coursesDAOOrderConverter == null)
+            coursesDAOOrderConverter = new CoursesDAOOrderConverter();
+
+        return coursesDAOOrderConverter;
     }
 
     private static CourseLevelsDAO getCoursesLevelsDAO() {
