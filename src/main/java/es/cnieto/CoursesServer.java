@@ -6,10 +6,10 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 
 import java.util.logging.Logger;
 
-public class CoursesServer {
+class CoursesServer {
     private final static Logger LOG = Logger.getLogger("es.cnieto.CoursesServer");
 
-    public void start() throws Exception {
+    void start() throws Exception {
         Server server = new Server(8080);
         createServlet(server);
         server.start();

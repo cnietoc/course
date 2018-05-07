@@ -105,13 +105,13 @@ public abstract class AppContext {
         return orderConverter;
     }
 
-    public static PaginationBox getPaginationBox() {
+    private static PaginationBox getPaginationBox() {
         if (paginationBox == null)
             paginationBox = new PaginationBox(getCoursesReadService(), getLinkCreator());
         return paginationBox;
     }
 
-    public static LinkCreator getLinkCreator() {
+    private static LinkCreator getLinkCreator() {
         if (linkCreator == null)
             linkCreator = new LinkCreator();
         return linkCreator;
