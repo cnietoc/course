@@ -33,12 +33,15 @@ public class CoursesListBox implements Serializable {
         OrderParameter orderParameter = getOrderFrom(request);
 
         StringBuilder html = new StringBuilder();
-        html.append("<div class=\"courseTableRow\">");
+
+        html.append("<div>");
+        html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
+        html.append("<div class=\"courseTable\">");
+
         printHeader(html);
 
         List<Course> courses = coursesReadService.readActivesPaginatedOrderBy(currentPage, orderConverter.from(orderParameter));
         courses.forEach(course -> printRow(html, course));
-
         html.append("</div>");
 
         paginationBox.printPagination(currentPage, orderParameter, html);
@@ -47,7 +50,7 @@ public class CoursesListBox implements Serializable {
     }
 
     private void printRow(StringBuilder html, Course course) {
-
+        html.append("<div class=\"courseTableRow\">");
         html.append("<div class=\"courseTableCell\">");
         html.append(course.getTitle());
         html.append("</div>");
@@ -64,9 +67,6 @@ public class CoursesListBox implements Serializable {
     }
 
     private void printHeader(StringBuilder html) {
-        html.append("<div>");
-        html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
-        html.append("<div class=\"courseTable\">");
         html.append("<div class=\"courseTableHeader\">");
         html.append("<div class=\"courseTableCell\">" + linkCreator.createLinkFor(TABLE_TITLE_TEXT, 1, OrderParameter.TITLE) + "</div>");
         html.append("<div class=\"courseTableCell\">" + linkCreator.createLinkFor(TABLE_HOURS_TEXT, 1, OrderParameter.HOURS) + "</div>");
