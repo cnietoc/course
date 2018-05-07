@@ -30,8 +30,10 @@ public abstract class AppContext {
     private static CourseLevelsReadService courseLevelsReadService;
     private static TeachersReadService teachersReadService;
 
-    private static CoursesListBox coursesListBox;
     private static OrderConverter orderConverter;
+    private static LinkCreator linkCreator;
+    private static PaginationBox paginationBox;
+    private static CoursesListBox coursesListBox;
     private static TitleInput titleInput;
     private static HoursInput hoursInput;
     private static LevelInput levelInput;
@@ -90,17 +92,29 @@ public abstract class AppContext {
         return teacherInput;
     }
 
+    private static CoursesListBox getCoursesListBox() {
+        if (coursesListBox == null) {
+            coursesListBox = new CoursesListBox(getCoursesReadService(), getOrderConverter(), getLinkCreator(), getPaginationBox());
+        }
+        return coursesListBox;
+    }
+
     private static OrderConverter getOrderConverter() {
         if (orderConverter == null)
             orderConverter = new OrderConverter();
         return orderConverter;
     }
 
-    private static CoursesListBox getCoursesListBox() {
-        if (coursesListBox == null) {
-            coursesListBox = new CoursesListBox(getCoursesReadService(), getOrderConverter());
-        }
-        return coursesListBox;
+    public static PaginationBox getPaginationBox() {
+        if (paginationBox == null)
+            paginationBox = new PaginationBox(getCoursesReadService(), getLinkCreator());
+        return paginationBox;
+    }
+
+    public static LinkCreator getLinkCreator() {
+        if (linkCreator == null)
+            linkCreator = new LinkCreator();
+        return linkCreator;
     }
 
     public static RestCourseController getRestCourseController() {

@@ -18,10 +18,14 @@ public class CoursesListBox implements Serializable {
     private static final String ORDER_PARAMETER = "order";
     private final CoursesReadService coursesReadService;
     private final OrderConverter orderConverter;
+    private final LinkCreator linkCreator;
+    private final PaginationBox paginationBox;
 
-    public CoursesListBox(CoursesReadService coursesReadService, OrderConverter orderConverter) {
+    public CoursesListBox(CoursesReadService coursesReadService, OrderConverter orderConverter, LinkCreator linkCreator, PaginationBox paginationBox) {
         this.coursesReadService = coursesReadService;
         this.orderConverter = orderConverter;
+        this.linkCreator = linkCreator;
+        this.paginationBox = paginationBox;
     }
 
     public String getHtml(HttpServletRequest request) {
@@ -29,55 +33,46 @@ public class CoursesListBox implements Serializable {
         OrderParameter orderParameter = getOrderFrom(request);
 
         StringBuilder html = new StringBuilder();
-        html.append("<div>");
-        html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
-        html.append("<div class=\"courseTable\">");
-        html.append("<div class=\"courseTableHeader\">");
-        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_TITLE_TEXT, 1, OrderParameter.TITLE) + "</div>");
-        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_HOURS_TEXT, 1, OrderParameter.HOURS) + "</div>");
-        html.append("<div class=\"courseTableCell\">" + createLinkFor(TABLE_LEVEL_TEXT, 1, OrderParameter.LEVEL) + "</div>");
-        html.append("<div class=\"courseTableCell\">" + TABLE_TEACHER_TEXT + "</div>");
-        html.append("</div>");
+        html.append("<div class=\"courseTableRow\">");
+        printHeader(html);
 
         List<Course> courses = coursesReadService.readActivesPaginatedOrderBy(currentPage, orderConverter.from(orderParameter));
-        for (Course course : courses) {
-            html.append("<div class=\"courseTableRow\">");
-            html.append("<div class=\"courseTableCell\">");
-            html.append(course.getTitle());
-            html.append("</div>");
-            html.append("<div class=\"courseTableCell\">");
-            html.append(course.getHours());
-            html.append("</div>");
-            html.append("<div class=\"courseTableCell\">");
-            html.append(course.getLevel());
-            html.append("</div>");
-            html.append("<div class=\"courseTableCell\">");
-            html.append(course.getTeacher().map(this::getTeacherCell).orElse("-"));
-            html.append("</div>");
-            html.append("</div>");
-        }
+        courses.forEach(course -> printRow(html, course));
+
         html.append("</div>");
 
-        printPagination(currentPage, orderParameter, html);
+        paginationBox.printPagination(currentPage, orderParameter, html);
 
         return html.toString();
     }
 
-    private void printPagination(int currentPage, OrderParameter orderParameter, StringBuilder html) {
+    private void printRow(StringBuilder html, Course course) {
 
-        int pages = coursesReadService.activesPages();
-        html.append("<div class=\"pagination\">");
-
-        for (int page = 1; page <= pages; page++) {
-            html.append(page == currentPage ? "<b>" : "");
-            html.append(createLinkFor(String.valueOf(page), page, orderParameter));
-            html.append(page == currentPage ? "</b>" : "");
-        }
+        html.append("<div class=\"courseTableCell\">");
+        html.append(course.getTitle());
+        html.append("</div>");
+        html.append("<div class=\"courseTableCell\">");
+        html.append(course.getHours());
+        html.append("</div>");
+        html.append("<div class=\"courseTableCell\">");
+        html.append(course.getLevel());
+        html.append("</div>");
+        html.append("<div class=\"courseTableCell\">");
+        html.append(course.getTeacher().map(this::getTeacherCell).orElse("-"));
+        html.append("</div>");
         html.append("</div>");
     }
 
-    private String createLinkFor(String text, int page, OrderParameter orderParameter) {
-        return "<a href=\"" + hrefFor(page, orderParameter) + "\" >" + text + "</a>";
+    private void printHeader(StringBuilder html) {
+        html.append("<div>");
+        html.append("<h1>" + LIST_TITLE_TEXT + "</h1>");
+        html.append("<div class=\"courseTable\">");
+        html.append("<div class=\"courseTableHeader\">");
+        html.append("<div class=\"courseTableCell\">" + linkCreator.createLinkFor(TABLE_TITLE_TEXT, 1, OrderParameter.TITLE) + "</div>");
+        html.append("<div class=\"courseTableCell\">" + linkCreator.createLinkFor(TABLE_HOURS_TEXT, 1, OrderParameter.HOURS) + "</div>");
+        html.append("<div class=\"courseTableCell\">" + linkCreator.createLinkFor(TABLE_LEVEL_TEXT, 1, OrderParameter.LEVEL) + "</div>");
+        html.append("<div class=\"courseTableCell\">" + TABLE_TEACHER_TEXT + "</div>");
+        html.append("</div>");
     }
 
     private int getPageFrom(HttpServletRequest request) {
@@ -90,10 +85,6 @@ public class CoursesListBox implements Serializable {
 
     private OrderParameter getOrderFrom(HttpServletRequest request) {
         return OrderParameter.findFrom(request.getParameter(ORDER_PARAMETER)).orElse(OrderParameter.TITLE);
-    }
-
-    private String hrefFor(int page, OrderParameter orderParameter) {
-        return "?page=" + page + "&order=" + orderParameter.getValue();
     }
 
     private String getTeacherCell(Teacher teacher) {
